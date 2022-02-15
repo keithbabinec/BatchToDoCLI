@@ -5,6 +5,15 @@ namespace BatchToDoCLI
 {
     public class Settings
     {
+        public static CommandArguments ParseCommandArguments(string[] args)
+        {
+            var cmdArgs = new CommandArguments();
+
+            // todo: implement
+
+            return cmdArgs;
+        }
+
         public static IConfigurationRoot LoadAppSettings()
         {
             var fileName = "";
