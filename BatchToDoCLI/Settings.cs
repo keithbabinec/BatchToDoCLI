@@ -35,6 +35,11 @@ namespace BatchToDoCLI
                             cmdArgs.CacheAuthTokens = true;
                             break;
                         }
+                    case "-whatif":
+                        {
+                            cmdArgs.WhatIfMode = true;
+                            break;
+                        }
                     default:
                         {
                             currentIsValue = true;

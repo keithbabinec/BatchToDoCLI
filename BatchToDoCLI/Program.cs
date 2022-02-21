@@ -1,5 +1,6 @@
 ﻿using BatchToDoCLI;
 using BatchToDoCLI.Definitions;
+using BatchToDoCLI.Execution;
 using BatchToDoCLI.Models;
 
 // parse command line switches.
@@ -39,7 +40,6 @@ catch (Exception ex)
     return (int)ExitCodes.MissingOrInvalidDefinitionYaml;
 }
 
-
 Console.WriteLine("Substituting batch definition variables.");
 TaskBatch batchTransformed = null;
 
@@ -55,49 +55,17 @@ catch (Exception ex)
     return (int)ExitCodes.FailedToTransformDefinitionYaml;
 }
 
-// authenticate to Microsoft Identity Platform and obtain a Graph API token.
-// token is good for an hour. cache it in user env vars if the option was passed.
+if (!cmdArgs.WhatIfMode)
+{
+    var commitMode = new Commit();
 
-var authSettings = settingsHelper.GetAuthSettings(settings);
+    var res = await commitMode.RunAsync(settingsHelper, settings, cmdArgs, batchTransformed).ConfigureAwait(false);
+    return (int)res;
+}
+else
+{
+    var whatIfMode = new WhatIf();
 
-Console.WriteLine("Auth configuration loaded.");
-
-string accessToken = String.Empty;
-
-//if (cmdArgs.CacheAuthTokens)
-//{
-//    if (!TokenCache.GetTokenFromCache(out accessToken))
-//    {
-//        Console.WriteLine("No recent cached token found. Will need to login.");
-//    }
-//    else
-//    {
-//        Console.WriteLine("Grabbed a token from the cache.");
-//    }
-//}
-
-//if (string.IsNullOrWhiteSpace(accessToken))
-//{
-//    var res = await DeviceCodeAuth.GetATokenForGraph(authSettings);
-
-//    if (res == null)
-//    {
-//        // no need to print an error message here.
-//        // an exception is thrown and caught within the token call, and is printed to the STDERR
-//        // already by the time this is reached.
-//        return (int)ExitCodes.FailedToAuthenticate;
-//    }
-//    else
-//    {
-//        Console.WriteLine(Environment.NewLine + "Logged in as " + res.Account.Username);
-
-//        if (cmdArgs.CacheAuthTokens)
-//        {
-//            TokenCache.SaveTokenToCache(res.AccessToken, DateTime.Now.AddMinutes(60));
-//            Console.WriteLine("Token saved to the cache (valid for 1 hour).");
-//        }
-//    }
-//}
-
-
-return (int)ExitCodes.Success;
+    var res = whatIfMode.Run(settingsHelper, settings, cmdArgs, batchTransformed);
+    return (int)res;
+}
