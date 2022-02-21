@@ -9,9 +9,67 @@ namespace BatchToDoCLI
         {
             var cmdArgs = new CommandArguments();
 
-            // todo: implement
+            int argPosition = 0;
 
-            return cmdArgs;
+            string argType = string.Empty;
+
+            while (argPosition < args.Length)
+            {
+                var current = args[argPosition];
+                var currentIsValue = false;
+
+                switch (current.ToLower())
+                {
+                    case "-batchdefinition":
+                        {
+                            argType = nameof(CommandArguments.BatchDefinition);
+                            break;
+                        }
+                    case "-variables":
+                        {
+                            argType = nameof(CommandArguments.Variables);
+                            break;
+                        }
+                    case "-cacheauthtokens":
+                        {
+                            cmdArgs.CacheAuthTokens = true;
+                            break;
+                        }
+                    default:
+                        {
+                            currentIsValue = true;
+                            break;
+                        }
+                }
+
+                if (currentIsValue)
+                {
+                    switch (argType)
+                    {
+                        case nameof(CommandArguments.BatchDefinition):
+                            {
+                                cmdArgs.BatchDefinition = current;
+                                break;
+                            }
+                        case nameof(CommandArguments.Variables):
+                            {
+                                cmdArgs.Variables = new Variables(current);
+                                break;
+                            }
+                    }
+                }
+
+                argPosition++;
+            }
+
+            if (cmdArgs.Validate())
+            {
+                return cmdArgs;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static IConfigurationRoot LoadAppSettings()
