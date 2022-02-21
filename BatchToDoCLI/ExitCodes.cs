@@ -8,6 +8,10 @@
 
         MissingOrInvalidSettingsJson = 2,
 
-        FailedToAuthenticate = 3
+        MissingOrInvalidDefinitionYaml = 3,
+
+        FailedToTransformDefinitionYaml = 4,
+
+        FailedToAuthenticate = 5
     }
 }

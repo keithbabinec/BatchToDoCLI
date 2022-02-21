@@ -6,6 +6,6 @@
 
         public string Description { get; set; }
 
-        public string DueDateExpression { get; set; }
+        public string DueDate { get; set; }
     }
 }

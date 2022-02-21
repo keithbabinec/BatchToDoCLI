@@ -5,7 +5,7 @@ namespace BatchToDoCLI
 {
     public class Settings
     {
-        public static CommandArguments ParseCommandArguments(string[] args)
+        public CommandArguments ParseCommandArguments(string[] args)
         {
             var cmdArgs = new CommandArguments();
 
@@ -72,7 +72,7 @@ namespace BatchToDoCLI
             }
         }
 
-        public static IConfigurationRoot LoadAppSettings()
+        public IConfigurationRoot LoadAppSettings()
         {
             var fileName = "";
 
@@ -100,7 +100,7 @@ namespace BatchToDoCLI
             return appConfig;
         }
 
-        public static AuthSettings GetAuthSettings(IConfigurationRoot settings)
+        public AuthSettings GetAuthSettings(IConfigurationRoot settings)
         {
             return new AuthSettings()
             {
