@@ -8,6 +8,7 @@ namespace BatchToDoCLI.Definitions
     {
         private Regex StrVariableMatcher;
         private Regex DateVariableMatcher;
+        private string OutputTimeFormat = "MM/dd/yyyy";
 
         public Transformer()
         {
@@ -68,18 +69,19 @@ namespace BatchToDoCLI.Definitions
 
         private string FillDateExpression(string original, Variables vars)
         {
-            var matches = DateVariableMatcher.Matches(original);
-            if (matches.Count == 0)
+            var dateExpressionMatches = DateVariableMatcher.Matches(original);
+            if (dateExpressionMatches.Count == 0)
             {
-                return original;
+                return FillTextVariables(original, vars);
             }
 
             var filledString = original;
 
-            foreach (Match match in matches)
+            foreach (Match match in dateExpressionMatches)
             {
                 string varKey = match.Value.Substring(2, match.Value.Length - 4);
                 var varAndExp = varKey.Split('-', '+');
+
                 char splitChar = match.Value.Substring(varAndExp[0].Length + 2, 1).FirstOrDefault();
 
                 if (vars.ContainsKey(varAndExp[0]))
@@ -103,34 +105,60 @@ namespace BatchToDoCLI.Definitions
             DateTime parsedDate = DateTime.Parse(date);
 
             var modifierType = expression.Last();
-            var modifierValue = expression.Take(expression.Length - 1).ToString();
+            var modifierValue = new string(expression.Take(expression.Length - 1).ToArray());
             var modifierAsInt = int.Parse(modifierValue);
 
             switch (modifierType)
             {
                 case 'd':
                     {
-                        break;
+                        if (symbol == '+')
+                        {
+                            return parsedDate.AddDays(modifierAsInt).ToString(OutputTimeFormat);
+                        }
+                        else
+                        {
+                            return parsedDate.AddDays(-modifierAsInt).ToString(OutputTimeFormat);
+                        }
                     }
                 case 'w':
                     {
-                        break;
+                        if (symbol == '+')
+                        {
+                            return parsedDate.AddDays(modifierAsInt * 7).ToString(OutputTimeFormat);
+                        }
+                        else
+                        {
+                            return parsedDate.AddDays(-(modifierAsInt * 7)).ToString(OutputTimeFormat);
+                        }
                     }
                 case 'm':
                     {
-                        break;
+                        if (symbol == '+')
+                        {
+                            return parsedDate.AddMonths(modifierAsInt).ToString(OutputTimeFormat);
+                        }
+                        else
+                        {
+                            return parsedDate.AddMonths(-(modifierAsInt)).ToString(OutputTimeFormat);
+                        }
                     }
                 case 'y':
                     {
-                        break;
+                        if (symbol == '+')
+                        {
+                            return parsedDate.AddYears(modifierAsInt).ToString(OutputTimeFormat);
+                        }
+                        else
+                        {
+                            return parsedDate.AddYears(-(modifierAsInt)).ToString(OutputTimeFormat);
+                        }
                     }
                 default:
                     {
                         throw new NotImplementedException($"Unexpected modifier type: {modifierType}");
                     }
             }
-
-            return "";
         }
     }
 }
