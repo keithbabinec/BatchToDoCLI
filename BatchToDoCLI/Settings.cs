@@ -95,7 +95,8 @@ namespace BatchToDoCLI
                 .Build();
 
             // Check for required settings
-            if (string.IsNullOrEmpty(appConfig[Constants.AppIdSettingName]) ||
+            if (string.IsNullOrEmpty(appConfig[Constants.GraphApiBaseUri]) || 
+                string.IsNullOrEmpty(appConfig[Constants.AppIdSettingName]) ||
                 string.IsNullOrEmpty(appConfig[Constants.ScopeSettingName]) ||
                 string.IsNullOrEmpty(appConfig[Constants.AuthoritySettingName]))
             {

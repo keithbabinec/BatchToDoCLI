@@ -2,6 +2,8 @@
 {
     public class Constants
     {
+        public const string GraphApiBaseUri = "GraphClient.BaseApiUri";
+
         public const string AppIdSettingName = "GraphClient.AppId";
 
         public const string ScopeSettingName = "GraphClient.Scopes";

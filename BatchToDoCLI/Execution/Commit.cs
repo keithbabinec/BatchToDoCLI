@@ -43,6 +43,7 @@ namespace BatchToDoCLI.Execution
                 else
                 {
                     Console.WriteLine(Environment.NewLine + "Logged in as " + res.Account.Username);
+                    accessToken = res.AccessToken;
 
                     if (cmdArgs.CacheAuthTokens)
                     {
@@ -52,9 +53,11 @@ namespace BatchToDoCLI.Execution
                 }
             }
 
-            // todo: implement call to commit the tasks
+            // call the helper method that actually invokes the graph API to create the batch.
 
-            return ExitCodes.Success;
+            var graphUri = settings[Constants.GraphApiBaseUri];
+            var tasker = new TaskCreator(graphUri);
+            return await tasker.CreateBatchAsync(accessToken, batchTransformed);
         }
     }
 }
