@@ -9,6 +9,8 @@ namespace BatchToDoCLI.Definitions
         private Regex StrVariableMatcher;
         private Regex DateVariableMatcher;
         private string OutputTimeFormat = "MM/dd/yyyy";
+        private const string CounterKey = "COUNTER";
+        private int CounterValue = 0;
 
         public Transformer()
         {
@@ -58,7 +60,12 @@ namespace BatchToDoCLI.Definitions
             {
                 string varKey = match.Value.Substring(2, match.Value.Length - 4);
 
-                if (vars.ContainsKey(varKey))
+                if (varKey == CounterKey)
+                {
+                    CounterValue++;
+                    filledString = filledString.Replace(match.Value, CounterValue.ToString());
+                }
+                else if (vars.ContainsKey(varKey))
                 {
                     filledString = filledString.Replace(match.Value, vars[varKey]);
                 }
