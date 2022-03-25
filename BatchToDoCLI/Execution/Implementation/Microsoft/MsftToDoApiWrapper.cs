@@ -1,13 +1,13 @@
 ﻿using BatchToDoCLI.Models;
 using System.Net.Http.Headers;
 
-namespace BatchToDoCLI.Execution
+namespace BatchToDoCLI.Execution.Implementation.Microsoft
 {
-    public class TaskCreator
+    public class MsftToDoApiWrapper : ITaskApiWrapper
     {
         private static HttpClient client = new HttpClient();
 
-        public TaskCreator(string graphApiBaseUri)
+        public MsftToDoApiWrapper(string graphApiBaseUri, string accessToken)
         {
             if (string.IsNullOrWhiteSpace(graphApiBaseUri))
             {
@@ -19,7 +19,7 @@ namespace BatchToDoCLI.Execution
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<ExitCodes> CreateBatchAsync(string accessToken, TaskBatch batchTransformed)
+        public async Task<ExitCodes> CreateBatchAsync(TaskBatch batchTransformed)
         {
             throw new NotImplementedException();
         }

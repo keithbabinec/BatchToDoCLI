@@ -1,6 +1,7 @@
 ﻿using BatchToDoCLI;
 using BatchToDoCLI.Definitions;
 using BatchToDoCLI.Execution;
+using BatchToDoCLI.Execution.Implementation.Microsoft;
 using BatchToDoCLI.Models;
 
 // parse command line switches.
@@ -57,7 +58,7 @@ catch (Exception ex)
 
 if (!cmdArgs.WhatIfMode)
 {
-    var commitMode = new Commit();
+    var commitMode = new MsftToDoTaskCreator();
 
     var res = await commitMode.RunAsync(settingsHelper, settings, cmdArgs, batchTransformed).ConfigureAwait(false);
     return (int)res;

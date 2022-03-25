@@ -1,4 +1,4 @@
-﻿using BatchToDoCLI.Auth;
+﻿using BatchToDoCLI.Auth.Microsoft;
 using Microsoft.Extensions.Configuration;
 
 namespace BatchToDoCLI
@@ -95,10 +95,10 @@ namespace BatchToDoCLI
                 .Build();
 
             // Check for required settings
-            if (string.IsNullOrEmpty(appConfig[Constants.GraphApiBaseUri]) || 
-                string.IsNullOrEmpty(appConfig[Constants.AppIdSettingName]) ||
-                string.IsNullOrEmpty(appConfig[Constants.ScopeSettingName]) ||
-                string.IsNullOrEmpty(appConfig[Constants.AuthoritySettingName]))
+            if (string.IsNullOrEmpty(appConfig[Constants.MsftGraphApiBaseUri]) || 
+                string.IsNullOrEmpty(appConfig[Constants.MsftAppIdSettingName]) ||
+                string.IsNullOrEmpty(appConfig[Constants.MsftScopeSettingName]) ||
+                string.IsNullOrEmpty(appConfig[Constants.MsftAuthoritySettingName]))
             {
                 return null;
             }
@@ -106,13 +106,13 @@ namespace BatchToDoCLI
             return appConfig;
         }
 
-        public AuthSettings GetAuthSettings(IConfigurationRoot settings)
+        public MsftAuthSettings GetMsftAuthSettings(IConfigurationRoot settings)
         {
-            return new AuthSettings()
+            return new MsftAuthSettings()
             {
-                AppId = settings[Constants.AppIdSettingName],
-                Scopes = settings[Constants.ScopeSettingName].Split(';'),
-                Authority = settings[Constants.AuthoritySettingName]
+                AppId = settings[Constants.MsftAppIdSettingName],
+                Scopes = settings[Constants.MsftScopeSettingName].Split(';'),
+                Authority = settings[Constants.MsftAuthoritySettingName]
             };
         }
     }

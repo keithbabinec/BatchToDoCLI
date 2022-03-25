@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
+﻿using Microsoft.Identity.Client;
 
-namespace BatchToDoCLI.Auth
+namespace BatchToDoCLI.Auth.Microsoft
 {
-    public class DeviceCodeAuth
+    public class MsftDeviceCodeAuth
     {
-        public static async Task<AuthenticationResult> GetATokenForGraph(AuthSettings settings)
+        public static async Task<AuthenticationResult> GetATokenForGraph(MsftAuthSettings settings)
         {
             IPublicClientApplication pca = PublicClientApplicationBuilder
                 .Create(settings.AppId)
@@ -28,7 +27,7 @@ namespace BatchToDoCLI.Auth
             }
         }
 
-        private static async Task<AuthenticationResult> AcquireByDeviceCodeAsync(IPublicClientApplication pca, AuthSettings settings)
+        private static async Task<AuthenticationResult> AcquireByDeviceCodeAsync(IPublicClientApplication pca, MsftAuthSettings settings)
         {
             try
             {

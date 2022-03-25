@@ -2,12 +2,12 @@
 {
     public class TokenCache
     {
-        public static bool GetTokenFromCache(out string TokenValue)
+        public static bool GetMsftTokenFromCache(out string TokenValue)
         {
             TokenValue = String.Empty;
 
-            var cacheDateStr = Environment.GetEnvironmentVariable(Constants.TokenCacheDateKeyName, EnvironmentVariableTarget.User);
-            var cacheValue = Environment.GetEnvironmentVariable(Constants.TokenCacheValueKeyName, EnvironmentVariableTarget.User);
+            var cacheDateStr = Environment.GetEnvironmentVariable(Constants.MsftTokenCacheDateKeyName, EnvironmentVariableTarget.User);
+            var cacheValue = Environment.GetEnvironmentVariable(Constants.MsftTokenCacheValueKeyName, EnvironmentVariableTarget.User);
 
             if (string.IsNullOrEmpty(cacheDateStr) || string.IsNullOrEmpty(cacheValue))
             {
@@ -33,10 +33,10 @@
             return true;
         }
 
-        public static void SaveTokenToCache(string TokenValue, DateTime TokenExpires)
+        public static void SaveMsftTokenToCache(string TokenValue, DateTime TokenExpires)
         {
-            Environment.SetEnvironmentVariable(Constants.TokenCacheValueKeyName, TokenValue, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable(Constants.TokenCacheDateKeyName, TokenExpires.ToString(), EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable(Constants.MsftTokenCacheValueKeyName, TokenValue, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable(Constants.MsftTokenCacheDateKeyName, TokenExpires.ToString(), EnvironmentVariableTarget.User);
         }
     }
 }

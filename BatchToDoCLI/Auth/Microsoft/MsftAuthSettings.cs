@@ -1,6 +1,6 @@
-﻿namespace BatchToDoCLI.Auth
+﻿namespace BatchToDoCLI.Auth.Microsoft
 {
-    public class AuthSettings
+    public class MsftAuthSettings
     {
         public string AppId { get; set; }
 
