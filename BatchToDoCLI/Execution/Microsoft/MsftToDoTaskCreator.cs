@@ -4,7 +4,7 @@ using BatchToDoCLI.Logging;
 using BatchToDoCLI.Models;
 using Microsoft.Extensions.Configuration;
 
-namespace BatchToDoCLI.Execution.Implementation.Microsoft
+namespace BatchToDoCLI.Execution.Microsoft
 {
     public class MsftToDoTaskCreator : ITaskCreator
     {

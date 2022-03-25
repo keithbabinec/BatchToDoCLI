@@ -1,7 +1,7 @@
 ﻿using BatchToDoCLI;
 using BatchToDoCLI.Definitions;
 using BatchToDoCLI.Execution;
-using BatchToDoCLI.Execution.Implementation.Microsoft;
+using BatchToDoCLI.Execution.Microsoft;
 using BatchToDoCLI.Logging;
 using BatchToDoCLI.Models;
 
