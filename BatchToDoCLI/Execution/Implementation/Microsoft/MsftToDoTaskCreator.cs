@@ -1,5 +1,6 @@
 ﻿using BatchToDoCLI.Auth;
 using BatchToDoCLI.Auth.Microsoft;
+using BatchToDoCLI.Logging;
 using BatchToDoCLI.Models;
 using Microsoft.Extensions.Configuration;
 
@@ -7,26 +8,56 @@ namespace BatchToDoCLI.Execution.Implementation.Microsoft
 {
     public class MsftToDoTaskCreator : ITaskCreator
     {
-        public async Task<ExitCodes> RunAsync(Settings settingsHelper, IConfigurationRoot settings, CommandArguments cmdArgs, TaskBatch batchTransformed)
+        private ILogging Logging;
+        private Settings SettingsHelper;
+        private IConfigurationRoot Settings;
+        private CommandArguments CmdArgs;
+
+        public MsftToDoTaskCreator(ILogging logging, Settings settingsHelper, IConfigurationRoot settings, CommandArguments cmdArgs)
+        {
+            if (logging == null)
+            {
+                throw new ArgumentNullException(nameof(logging));
+            }
+            if (settingsHelper == null)
+            {
+                throw new ArgumentNullException(nameof(settingsHelper));
+            }
+            if (settings == null)
+            {
+                throw new ArgumentNullException(nameof(settings));
+            }
+            if (cmdArgs == null)
+            {
+                throw new ArgumentNullException(nameof(cmdArgs));
+            }
+
+            Logging = logging;
+            SettingsHelper = settingsHelper;
+            Settings = settings;
+            CmdArgs = cmdArgs;
+        }
+
+        public async Task<ExitCodes> RunAsync(TaskBatch batchTransformed)
         {
             // authenticate to Microsoft Identity Platform and obtain a Graph API token.
             // token is good for an hour. cache it in user env vars if the option was passed.
 
-            var authSettings = settingsHelper.GetMsftAuthSettings(settings);
+            var authSettings = SettingsHelper.GetMsftAuthSettings(Settings);
 
-            Console.WriteLine("Auth configuration loaded.");
+            Logging.WriteInfo("Auth configuration loaded.");
 
             string accessToken = String.Empty;
 
-            if (cmdArgs.CacheAuthTokens)
+            if (CmdArgs.CacheAuthTokens)
             {
                 if (!TokenCache.GetMsftTokenFromCache(out accessToken))
                 {
-                    Console.WriteLine("No recent cached token found. Will need to login.");
+                    Logging.WriteInfo("No recent cached token found. Will need to login.");
                 }
                 else
                 {
-                    Console.WriteLine("Grabbed a token from the cache.");
+                    Logging.WriteInfo("Grabbed a token from the cache.");
                 }
             }
 
@@ -43,20 +74,20 @@ namespace BatchToDoCLI.Execution.Implementation.Microsoft
                 }
                 else
                 {
-                    Console.WriteLine(Environment.NewLine + "Logged in as " + res.Account.Username);
+                    Logging.WriteInfo(Environment.NewLine + "Logged in as " + res.Account.Username);
                     accessToken = res.AccessToken;
 
-                    if (cmdArgs.CacheAuthTokens)
+                    if (CmdArgs.CacheAuthTokens)
                     {
                         TokenCache.SaveMsftTokenToCache(res.AccessToken, DateTime.Now.AddMinutes(60));
-                        Console.WriteLine("Token saved to the cache (valid for 1 hour).");
+                        Logging.WriteInfo("Token saved to the cache (valid for 1 hour).");
                     }
                 }
             }
 
             // call the helper method that actually invokes the graph API to create the batch.
 
-            var graphUri = settings[Constants.MsftGraphApiBaseUri];
+            var graphUri = Settings[Constants.MsftGraphApiBaseUri];
             var tasker = new MsftToDoApiWrapper(graphUri, accessToken);
             return await tasker.CreateBatchAsync(batchTransformed);
         }

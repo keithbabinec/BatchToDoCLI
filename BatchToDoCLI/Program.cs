@@ -2,11 +2,13 @@
 using BatchToDoCLI.Definitions;
 using BatchToDoCLI.Execution;
 using BatchToDoCLI.Execution.Implementation.Microsoft;
+using BatchToDoCLI.Logging;
 using BatchToDoCLI.Models;
 
 // parse command line switches.
 // load the settings stored in appsettings.json
 
+var logger = new ConsoleLogger();
 var settingsHelper = new Settings();
 var cmdArgs = settingsHelper.ParseCommandArguments(args);
 var settings = settingsHelper.LoadAppSettings();
@@ -19,14 +21,14 @@ if (cmdArgs == null)
 
 if (settings == null)
 {
-    Console.Error.WriteLine("Required appsettings.json file is missing, or has settings that aren't filled out.");
+    logger.WriteError("Required appsettings.json file is missing, or has settings that aren't filled out.");
     return (int)ExitCodes.MissingOrInvalidSettingsJson;
 }
 
 // load and parse the batch definition file provided in the arguments.
 // then try to transform the definition variables with real values.
 
-Console.WriteLine("Loading batch definition yaml file from disk.");
+logger.WriteInfo("Loading batch definition yaml file from disk.");
 TaskBatch batchDefinition = null;
 
 try
@@ -36,12 +38,12 @@ try
 }
 catch (Exception ex)
 {
-    Console.Error.WriteLine($"Batch definition file {cmdArgs.BatchDefinition} could not be loaded. It doesn't exist, wasn't accessible, or contains invalid YAML syntax. Full error below:");
-    Console.Error.WriteLine(ex.ToString());
+    logger.WriteError($"Batch definition file {cmdArgs.BatchDefinition} could not be loaded. It doesn't exist, wasn't accessible, or contains invalid YAML syntax. Full error below:");
+    logger.WriteError(ex.ToString());
     return (int)ExitCodes.MissingOrInvalidDefinitionYaml;
 }
 
-Console.WriteLine("Substituting batch definition variables.");
+logger.WriteInfo("Substituting batch definition variables.");
 TaskBatch batchTransformed = null;
 
 try
@@ -51,22 +53,22 @@ try
 }
 catch (Exception ex)
 {
-    Console.Error.WriteLine($"Batch definition file {cmdArgs.BatchDefinition} could not be transformed. We ran into an error when trying to substitute variables:");
-    Console.Error.WriteLine(ex.ToString());
+    logger.WriteError($"Batch definition file {cmdArgs.BatchDefinition} could not be transformed. We ran into an error when trying to substitute variables:");
+    logger.WriteError(ex.ToString());
     return (int)ExitCodes.FailedToTransformDefinitionYaml;
 }
 
 if (!cmdArgs.WhatIfMode)
 {
-    var commitMode = new MsftToDoTaskCreator();
+    var commitMode = new MsftToDoTaskCreator(logger, settingsHelper, settings, cmdArgs);
 
-    var res = await commitMode.RunAsync(settingsHelper, settings, cmdArgs, batchTransformed).ConfigureAwait(false);
+    var res = await commitMode.RunAsync(batchTransformed).ConfigureAwait(false);
     return (int)res;
 }
 else
 {
-    var whatIfMode = new WhatIf();
+    var whatIfMode = new WhatIf(logger);
 
-    var res = whatIfMode.Run(settingsHelper, settings, cmdArgs, batchTransformed);
+    var res = whatIfMode.Run(batchTransformed);
     return (int)res;
 }

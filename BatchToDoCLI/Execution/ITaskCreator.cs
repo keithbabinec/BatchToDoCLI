@@ -1,10 +1,11 @@
-﻿using BatchToDoCLI.Models;
+﻿using BatchToDoCLI.Logging;
+using BatchToDoCLI.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace BatchToDoCLI.Execution
 {
     public interface ITaskCreator
     {
-        Task<ExitCodes> RunAsync(Settings settingsHelper, IConfigurationRoot settings, CommandArguments cmdArgs, TaskBatch batchTransformed);
+        Task<ExitCodes> RunAsync(TaskBatch batchTransformed);
     }
 }
