@@ -25,7 +25,7 @@ namespace BatchToDoCLI.Execution
             var serializer = new SerializerBuilder().Build();
             var yamlText = serializer.Serialize(batchTransformed);
 
-            Logging.WriteInfo("Operating in -WhatIf mode. No tasks will be created. The following tasks are what would have been created." + Environment.NewLine);
+            Logging.WriteInfo("Operating in -WhatIf mode. No tasks will be created. The following tasks are what would have been created.");
             Logging.WriteInfo(yamlText);
 
             return ExitCodes.Success;

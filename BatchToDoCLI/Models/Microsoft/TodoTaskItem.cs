@@ -2,47 +2,20 @@
 {
     public class TodoTaskItem
     {
-        public TodoTaskItem()
-        {
-        }
+        public string importance { get; set; }
 
-        public TodoTaskItem(TaskItem item, string timeZone, string dateFormat)
-        {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
+        public bool isReminderOn { get; set; }
 
-            title = item.Name;
-            body = new TodoTaskItemBody()
-            {
-                contentType = "text",
-                content = item.Description
-            };
+        public TodoTaskItemDateTime reminderDateTime { get; set; }
 
-            var dueDate = DateTime.ParseExact(item.DueDate, dateFormat, null);
+        public TodoTaskItemDateTime dueDateTime { get; set; }
 
-            dueDateTime = new TodoTaskItemDateTime()
-            {
-                dateTime = dueDate.ToString("s"),
-                timeZone = timeZone
-            };
-        }
+        public string title { get; set; }
 
-        public string importance;
+        public string status { get; set; }
 
-        public bool isReminderOn;
+        public TodoTaskItemBody body { get; set; }
 
-        public TodoTaskItemDateTime reminderDateTime;
-
-        public TodoTaskItemDateTime dueDateTime;
-
-        public string title;
-
-        public string status;
-
-        public TodoTaskItemBody body;
-
-        public string id;
+        public string id { get; set; }
     }
 }

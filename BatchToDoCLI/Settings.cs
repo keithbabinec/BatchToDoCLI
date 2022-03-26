@@ -68,15 +68,8 @@ namespace BatchToDoCLI
                             }
                         case nameof(CommandArguments.TimeZone):
                             {
-                                var systemZones = TimeZoneInfo.GetSystemTimeZones();
-
-                                if (systemZones.Any(x => string.Equals(x.DisplayName, current, StringComparison.OrdinalIgnoreCase)))
-                                {
-                                    cmdArgs.TimeZone = current;
-                                    break;
-                                }
-
-                                return null;
+                                cmdArgs.TimeZone = current;
+                                break;
                             }
                     }
                 }

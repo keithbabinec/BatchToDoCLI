@@ -50,7 +50,7 @@ namespace BatchToDoCLI.Execution.Microsoft
 
         public async Task<ExitCodes> CreateBatchAsync(TaskBatch batchTransformed)
         {
-            Logging.WriteInfo($"Checking if the task list {batchTransformed.BatchName} already exists.");
+            Logging.WriteInfo($"Checking if the task list '{batchTransformed.BatchName}' already exists.");
 
             var taskListObj = await FetchTaskListAsync(batchTransformed.BatchName).ConfigureAwait(false);
 
@@ -60,28 +60,33 @@ namespace BatchToDoCLI.Execution.Microsoft
 
                 taskListObj = await CreateTaskListAsync(batchTransformed.BatchName).ConfigureAwait(false);
 
-                Logging.WriteInfo($"New task list created. ID: {taskListObj}");
+                Logging.WriteInfo($"New task list created.");
             }
             else
             {
-                Logging.WriteInfo($"Task list already exists, no need to create it. ID: {taskListObj}");
+                Logging.WriteInfo($"Task list already exists, no need to create it.");
             }
 
-            Logging.WriteInfo($"Querying for existing tasks under task list {batchTransformed.BatchName}.");
+            Logging.WriteInfo($"Querying for existing tasks under task list '{batchTransformed.BatchName}'.");
 
             var taskListTasks = await FetchTaskListTasks(taskListObj.id).ConfigureAwait(false);
 
             Logging.WriteInfo($"Found {taskListTasks.Count} total task(s) under this task list.");
 
-            foreach (var item in batchTransformed.Tasks)
+            for (int i = batchTransformed.Tasks.Count - 1; i >= 0; i--)
             {
+                // create the tasks in backwards order.
+                // otherwise the list will be backwards when viewing in To-Do.
+
+                var item = batchTransformed.Tasks[i];
+
                 if (!taskListTasks.Any(x => String.Equals(x.title, item.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     Logging.WriteInfo($"Task '{item.Name}' doesn't already exist, creating it now.");
                     
                     var newTask = await CreateTaskAsync(taskListObj.id, item).ConfigureAwait(false);
 
-                    Logging.WriteInfo($"Task created successfully. ID: {newTask.id}");
+                    Logging.WriteInfo($"Task created successfully.");
                 }
                 else
                 {
@@ -113,7 +118,7 @@ namespace BatchToDoCLI.Execution.Microsoft
 
         private async Task<TodoTaskList> CreateTaskListAsync(string taskListName)
         {
-            var tl = new TodoTaskList(taskListName);
+            var tl = new TodoTaskListPostModel(taskListName);
             var serialized = JsonSerializer.Serialize(tl, tl.GetType());
 
             var httpContent = new StringContent(serialized, System.Text.Encoding.UTF8, "application/json");
@@ -146,7 +151,7 @@ namespace BatchToDoCLI.Execution.Microsoft
 
         private async Task<TodoTaskItem> CreateTaskAsync(string taskListId, TaskItem item)
         {
-            var taskItem = new TodoTaskItem(item, Timezone, DateFormat);
+            var taskItem = new TodoTaskItemPostModel(item, Timezone, DateFormat);
             var serialized = JsonSerializer.Serialize(taskItem, taskItem.GetType());
 
             var httpContent = new StringContent(serialized, System.Text.Encoding.UTF8, "application/json");

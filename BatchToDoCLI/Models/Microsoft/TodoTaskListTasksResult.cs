@@ -2,6 +2,6 @@
 {
     public class TodoTaskListTasksResult
     {
-        public List<TodoTaskItem> value;
+        public List<TodoTaskItem> value { get; set; }
     }
 }

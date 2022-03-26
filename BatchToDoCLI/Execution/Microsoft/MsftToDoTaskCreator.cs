@@ -74,7 +74,7 @@ namespace BatchToDoCLI.Execution.Microsoft
                 }
                 else
                 {
-                    Logging.WriteInfo(Environment.NewLine + "Logged in as " + res.Account.Username);
+                    Logging.WriteInfo("Logged in as " + res.Account.Username);
                     accessToken = res.AccessToken;
 
                     if (CmdArgs.CacheAuthTokens)

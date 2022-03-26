@@ -35,7 +35,7 @@ namespace BatchToDoCLI.Auth.Microsoft
                     deviceCodeResult =>
                     {
                         // print the 'device code' login prompt / url.
-                        Console.WriteLine(Environment.NewLine + deviceCodeResult.Message);
+                        Console.WriteLine(deviceCodeResult.Message);
                         return Task.FromResult(0);
                     }).ExecuteAsync();
 
