@@ -48,7 +48,7 @@ TaskBatch batchTransformed = null;
 
 try
 {
-    var transformer = new Transformer();
+    var transformer = new Transformer(settings[Constants.DateFormatKeyName]);
     batchTransformed = transformer.TransformFromVariables(batchDefinition, cmdArgs.Variables);
 }
 catch (Exception ex)

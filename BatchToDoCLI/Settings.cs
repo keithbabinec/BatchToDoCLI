@@ -30,6 +30,11 @@ namespace BatchToDoCLI
                             argType = nameof(CommandArguments.Variables);
                             break;
                         }
+                    case "-timezone":
+                        {
+                            argType = nameof(CommandArguments.TimeZone);
+                            break;
+                        }
                     case "-cacheauthtokens":
                         {
                             cmdArgs.CacheAuthTokens = true;
@@ -60,6 +65,18 @@ namespace BatchToDoCLI
                             {
                                 cmdArgs.Variables = new Variables(current);
                                 break;
+                            }
+                        case nameof(CommandArguments.TimeZone):
+                            {
+                                var systemZones = TimeZoneInfo.GetSystemTimeZones();
+
+                                if (systemZones.Any(x => string.Equals(x.DisplayName, current, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    cmdArgs.TimeZone = current;
+                                    break;
+                                }
+
+                                return null;
                             }
                     }
                 }
@@ -95,7 +112,8 @@ namespace BatchToDoCLI
                 .Build();
 
             // Check for required settings
-            if (string.IsNullOrEmpty(appConfig[Constants.MsftGraphApiBaseUri]) || 
+            if (string.IsNullOrEmpty(appConfig[Constants.DateFormatKeyName]) || 
+                string.IsNullOrEmpty(appConfig[Constants.MsftGraphApiBaseUri]) || 
                 string.IsNullOrEmpty(appConfig[Constants.MsftAppIdSettingName]) ||
                 string.IsNullOrEmpty(appConfig[Constants.MsftScopeSettingName]) ||
                 string.IsNullOrEmpty(appConfig[Constants.MsftAuthoritySettingName]))

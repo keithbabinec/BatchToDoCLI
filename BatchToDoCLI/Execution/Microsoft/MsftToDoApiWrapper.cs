@@ -12,7 +12,11 @@ namespace BatchToDoCLI.Execution.Microsoft
 
         private ILogging Logging;
 
-        public MsftToDoApiWrapper(ILogging logging, string graphApiBaseUri, string accessToken)
+        private string Timezone;
+
+        private string DateFormat;
+
+        public MsftToDoApiWrapper(ILogging logging, string graphApiBaseUri, string accessToken, string timeZone, string dateFormat)
         {
             if (logging is null)
             {
@@ -26,7 +30,17 @@ namespace BatchToDoCLI.Execution.Microsoft
             {
                 throw new ArgumentException(nameof(accessToken) + " must be provided.");
             }
+            if (string.IsNullOrWhiteSpace(timeZone))
+            {
+                throw new ArgumentException($"'{nameof(timeZone)}' cannot be null or whitespace.");
+            }
+            if (string.IsNullOrWhiteSpace(dateFormat))
+            {
+                throw new ArgumentException($"'{nameof(dateFormat)}' cannot be null or whitespace.");
+            }
 
+            Timezone = timeZone;
+            DateFormat = dateFormat;
             Logging = logging;
             client.BaseAddress = new Uri(graphApiBaseUri);
             client.DefaultRequestHeaders.Accept.Clear();
@@ -65,9 +79,9 @@ namespace BatchToDoCLI.Execution.Microsoft
                 {
                     Logging.WriteInfo($"Task '{item.Name}' doesn't already exist, creating it now.");
                     
-                    string newTaskId = await CreateTaskAsync(item);
+                    var newTask = await CreateTaskAsync(taskListObj.id, item).ConfigureAwait(false);
 
-                    Logging.WriteInfo($"Task created successfully. ID: {newTaskId}");
+                    Logging.WriteInfo($"Task created successfully. ID: {newTask.id}");
                 }
                 else
                 {
@@ -82,83 +96,68 @@ namespace BatchToDoCLI.Execution.Microsoft
 
         private async Task<TodoTaskList> FetchTaskListAsync(string taskListName)
         {
-            var stream = await client.GetStreamAsync($"me/todo/lists").ConfigureAwait(false);
-            var result = await JsonSerializer.DeserializeAsync<TodoTaskListsResult>(stream).ConfigureAwait(false);
+            using (var stream = await client.GetStreamAsync($"me/todo/lists").ConfigureAwait(false))
+            {
+                var result = await JsonSerializer.DeserializeAsync<TodoTaskListsResult>(stream).ConfigureAwait(false);
 
-            if (result == null || result.value == null || result.value.Count == 0)
-            {
-                return null;
-            }
-            else
-            {
-                return result.value.FirstOrDefault(x => String.Equals(x.displayName, taskListName, StringComparison.OrdinalIgnoreCase));
+                if (result == null || result.value == null || result.value.Count == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return result.value.FirstOrDefault(x => string.Equals(x.displayName, taskListName, StringComparison.OrdinalIgnoreCase));
+                }
             }
         }
 
         private async Task<TodoTaskList> CreateTaskListAsync(string taskListName)
         {
-            // POST /me/todo/lists
-            // Content-Type	application/json
-            /*
-            {
-                "displayName": "Travel items"
-            }
-            // returns 
-            {
-              "@odata.type": "#microsoft.graph.todoTaskList",
-              "id": "AAMkADIyAAAhrbPWAAA=",
-              "displayName": "Travel items",
-              "isOwner": true,
-              "isShared": false,
-              "wellknownListName": "none"
-            }
-             */
+            var tl = new TodoTaskList(taskListName);
+            var serialized = JsonSerializer.Serialize(tl, tl.GetType());
+
+            var httpContent = new StringContent(serialized, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("me/todo/lists", httpContent).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseObj = JsonSerializer.Deserialize<TodoTaskList>(responseContent);
+
+            return responseObj;
         }
 
         private async Task<List<TodoTaskItem>> FetchTaskListTasks(string taskListId)
         {
-            var stream = await client.GetStreamAsync($"me/todo/lists/{taskListId}/tasks").ConfigureAwait(false);
-            var result = await JsonSerializer.DeserializeAsync<TodoTaskListTasksResult>(stream).ConfigureAwait(false);
+            using (var stream = await client.GetStreamAsync($"me/todo/lists/{taskListId}/tasks").ConfigureAwait(false))
+            {
+                var result = await JsonSerializer.DeserializeAsync<TodoTaskListTasksResult>(stream).ConfigureAwait(false);
 
-            if (result == null || result.value == null || result.value.Count == 0)
-            {
-                return new List<TodoTaskItem>();
-            }
-            else
-            {
-                return result.value;
-            }
+                if (result == null || result.value == null || result.value.Count == 0)
+                {
+                    return new List<TodoTaskItem>();
+                }
+                else
+                {
+                    return result.value;
+                }
+            }   
         }
 
-        private async Task<string> CreateTaskAsync(TaskItem item)
+        private async Task<TodoTaskItem> CreateTaskAsync(string taskListId, TaskItem item)
         {
-            // POST /me/todo/lists/{todoTaskListId}/tasks
-            // Content-Type	application/json
-            // body: https://docs.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0&tabs=http#request-body
-            /* response:
-             {
-               "@odata.etag":"W/\"xzyPKP0BiUGgld+lMKXwbQAAnBoTIw==\"",
-               "importance":"low",
-               "isReminderOn":false,
-               "status":"notStarted",
-               "title":"A new task",
-               "createdDateTime":"2020-08-18T09:03:05.8339192Z",
-               "lastModifiedDateTime":"2020-08-18T09:03:06.0827766Z",
-               "id":"AlMKXwbQAAAJws6wcAAAA=",
-               "body":{
-                  "content":"",
-                  "contentType":"text"
-               },
-               "linkedResources":[
-                  {
-                     "id":"f9cddce2-dce2-f9cd-e2dc-cdf9e2dccdf9",
-                     "webUrl":"http://microsoft.com",
-                     "applicationName":"Microsoft",
-                     "displayName":"Microsoft"
-                  }
-               ]
-            }
-             */
+            var taskItem = new TodoTaskItem(item, Timezone, DateFormat);
+            var serialized = JsonSerializer.Serialize(taskItem, taskItem.GetType());
+
+            var httpContent = new StringContent(serialized, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync($"me/todo/lists/{taskListId}/tasks", httpContent).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseObj = JsonSerializer.Deserialize<TodoTaskItem>(responseContent);
+
+            return responseObj;
         }
     }
 }

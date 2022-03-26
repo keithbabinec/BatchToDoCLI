@@ -17,5 +17,7 @@
         public const string MsftTokenCacheDateKeyName = "BATCH_TODO_MSFT_TOKEN_EXPIRES";
 
         public const string MsftTokenCacheValueKeyName = "BATCH_TODO_MSFT_TOKEN_VALUE";
+
+        public const string DateFormatKeyName = "DateFormat";
     }
 }

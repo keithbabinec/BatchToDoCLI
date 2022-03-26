@@ -88,7 +88,7 @@ namespace BatchToDoCLI.Execution.Microsoft
             // call the helper method that actually invokes the graph API to create the batch.
 
             var graphUri = Settings[Constants.MsftGraphApiBaseUri];
-            var tasker = new MsftToDoApiWrapper(graphUri, accessToken);
+            var tasker = new MsftToDoApiWrapper(Logging, graphUri, accessToken, CmdArgs.TimeZone, Settings[Constants.DateFormatKeyName]);
             return await tasker.CreateBatchAsync(batchTransformed);
         }
     }

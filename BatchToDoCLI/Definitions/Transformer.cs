@@ -8,12 +8,13 @@ namespace BatchToDoCLI.Definitions
     {
         private Regex StrVariableMatcher;
         private Regex DateVariableMatcher;
-        private string OutputTimeFormat = "MM/dd/yyyy";
+        private string OutputTimeFormat;
         private const string CounterKey = "COUNTER";
         private int CounterValue = 0;
 
-        public Transformer()
+        public Transformer(string dateTimeFormat)
         {
+            OutputTimeFormat = dateTimeFormat;
             StrVariableMatcher = new Regex("{{\\w+}}");
             DateVariableMatcher = new Regex("{{\\w+[+|-]\\d+[d|w|m|y]}}");
         }
