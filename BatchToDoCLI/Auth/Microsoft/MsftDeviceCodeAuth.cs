@@ -19,7 +19,7 @@ namespace BatchToDoCLI.Auth.Microsoft
                 // All AcquireToken* methods store the tokens in the cache, so check the cache first
                 return await pca.AcquireTokenSilent(settings.Scopes, accounts.FirstOrDefault()).ExecuteAsync();
             }
-            catch (MsalUiRequiredException ex)
+            catch (MsalUiRequiredException)
             {
                 // No token found in the cache or AAD insists that a form interactive auth is required (e.g. the tenant admin turned on MFA)
                 // If you want to provide a more complex user experience, check out ex.Classification

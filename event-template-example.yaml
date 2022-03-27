@@ -1,0 +1,16 @@
+---
+BatchName: 'My Task List: {{EVENTNAME}}'
+Tasks:
+- Name: "({{COUNTER}}) {{EVENTNAME}}: First task title"
+  Description:
+    This is the body/description of the first task
+  DueDate: "{{EVENTDATE-3w}}"
+- Name: "({{COUNTER}}) {{EVENTNAME}}: Second task title"
+  Description:
+    This is the body/description of the second task.
+    You can also have multiple lines here.
+  DueDate: "{{EVENTDATE}}"
+- Name: "({{COUNTER}}) {{EVENTNAME}}: Third task title"
+  Description:
+    This is the body/description of the third task.
+  DueDate: "{{EVENTDATE+1m}}"
