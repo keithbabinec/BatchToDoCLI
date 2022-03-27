@@ -110,6 +110,7 @@ In order to authenticate to the Microsoft ToDo API, you need a Microsoft Graph t
 7. On the next page, copy the 'Application (client) ID to your clipboard. 
 
     Open up the BatchToDoCLI's ```bin\Debug\net6.0\appsettings.json``` file. 
+    
     Paste the client ID value into the ```Msft.GraphClient.AppId``` setting (there will be a blank spot here), then save the file.
 
 8. Select 'Authentication' from the 'Manage' menu. 
