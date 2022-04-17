@@ -16,7 +16,7 @@
             title = item.Name;
             body = new TodoTaskItemBody()
             {
-                contentType = "text",
+                contentType = "html",
                 content = item.Description
             };
 
